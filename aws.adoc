@@ -1,0 +1,165 @@
+== 竟价实例
+* 申请竟价实例，如果有limit限制，就联系客服
+* 另外在创建竟价实例时,价格为0.9$时提示capacity-over..., 实际p2的正价就是0.9$一小时， 但是因为当时我急着用，所以另外申请了一个加到了0.91，成功了，到时候得check一下账单是不是超过了
+
+
+== 环境
+* 登录使用ubuntu作为用户名
+
+image::images/Image-060817-124118.811.png[]
+* 进去之后clone项目,然后在项目目录下启动jupyter notebook
+```
+ubuntu@ip-172-31-11-164:~/udacity$ git clone https://github.com/heirish/uda_machine_learning_capstone.git
+Cloning into 'uda_machine_learning_capstone'...
+remote: Counting objects: 18, done.
+remote: Compressing objects: 100% (12/12), done.
+remote: Total 18 (delta 7), reused 12 (delta 4), pack-reused 0
+Unpacking objects: 100% (18/18), done.
+Checking connectivity... done.
+ubuntu@ip-172-31-11-164:~/udacity$ ls -ltr
+total 4
+drwxrwxr-x 3 ubuntu ubuntu 4096 Aug  6 04:36 uda_machine_learning_capstone
+ubuntu@ip-172-31-11-164:~/udacity$ cd uda_machine_learning_capstone/
+ubuntu@ip-172-31-11-164:~/udacity/uda_machine_learning_capstone$ ls
+README.md  uda_machine_learning_capstone.ipynb
+ubuntu@ip-172-31-11-164:~/udacity/uda_machine_learning_capstone$ ls
+README.md  uda_machine_learning_capstone.ipynb
+ubuntu@ip-172-31-11-164:~/udacity/uda_machine_learning_capstone$ jupyte notebook
+jupyte: command not found
+ubuntu@ip-172-31-11-164:~/udacity/uda_machine_learning_capstone$ screen jupyter notebook --ip=0.0.0.0
+```
+* 再在你本地的浏览器里访问:http://<server ip>:8888
+* 安装包
+** sudo su切换到root (也可不用)
+** keras可视化所需包(正确的安装顺序是graphviz->grapphviz软件本身->pydot):
+```
+sudo /opt/anaconda3/bin/pip3.5 install graphviz
+sudo apt-get install graphviz
+sudo apt-get -f install (遇到错误The following packages have unmet dependencies:时使用)
+sudo apt-get install graphviz
+sudo /opt/anaconda3/bin/pip3.5 install pydot
+```
+** AttributeError: module 'pydot' has no attribute 'find_graphviz'
+```
+sudo /opt/anaconda3/bin/pip3.5 install pydot-ng
+```
+** 我去，搞了一天貌似根本就没有用到GPU，全是在用CPU算，难怪那么慢
+注意jupyter的日志
+```
+I tensorflow/stream_executor/dso_loader.cc:111] successfully opened CUDA library libcublas.so locally
+I tensorflow/stream_executor/dso_loader.cc:111] successfully opened CUDA library libcudnn.so locally
+I tensorflow/stream_executor/dso_loader.cc:111] successfully opened CUDA library libcufft.so locally
+I tensorflow/stream_executor/dso_loader.cc:111] successfully opened CUDA library libcuda.so.1 locally
+I tensorflow/stream_executor/dso_loader.cc:111] successfully opened CUDA library libcurand.so locally
+E tensorflow/stream_executor/cuda/cuda_driver.cc:491] failed call to cuInit: CUDA_ERROR_NO_DEVICE
+I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:153] retrieving CUDA diagnostic information for host: ip-172-31-11-164
+I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:160] hostname: ip-172-31-11-164
+I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:185] libcuda reported version is: 375.66.0
+I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:356] driver version file contents: """NVRM version: NVIDIA UNIX x86_64 Kernel Module  367.57  Mon Oct  3 20:37:01 PDT 2016
+GCC version:  gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.4) 
+"""
+I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:189] kernel reported version is: 367.57.0
+E tensorflow/stream_executor/cuda/cuda_diagnostics.cc:296] kernel version 367.57.0 does not match DSO version 375.66.0 -- cannot find working devices in this configuration
+```
+
+*** 正常打出来的应该是这样的
+```
+[W 15:14:50.028 NotebookApp] Replacing stale connection: 52cbdb3f-e8f9-44dc-917b-e4669eabd3c3:465453337720472E8C18D326F73798DC
+I tensorflow/stream_executor/dso_loader.cc:111] successfully opened CUDA library libcublas.so locally
+I tensorflow/stream_executor/dso_loader.cc:111] successfully opened CUDA library libcudnn.so locally
+I tensorflow/stream_executor/dso_loader.cc:111] successfully opened CUDA library libcufft.so locally
+I tensorflow/stream_executor/dso_loader.cc:111] successfully opened CUDA library libcuda.so.1 locally
+I tensorflow/stream_executor/dso_loader.cc:111] successfully opened CUDA library libcurand.so locally
+[I 15:15:39.271 NotebookApp] Saving file at /uda_machine_learning_capstone.ipynb
+I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:925] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+I tensorflow/core/common_runtime/gpu/gpu_device.cc:951] Found device 0 with properties: 
+name: Tesla K80
+major: 3 minor: 7 memoryClockRate (GHz) 0.8235
+pciBusID 0000:00:1e.0
+Total memory: 11.17GiB
+Free memory: 11.11GiB
+I tensorflow/core/common_runtime/gpu/gpu_device.cc:972] DMA: 0 
+I tensorflow/core/common_runtime/gpu/gpu_device.cc:982] 0:   Y 
+I tensorflow/core/common_runtime/gpu/gpu_device.cc:1041] Creating TensorFlow device (/gpu:0) -> (device: 0, name: Tesla K80, pci bus id: 0000:00:1e.0)
+```
+*** stackoverflow上面的解答
+``` I don't believe the error is related to Tensorflow. You should get the same error running **nvidia-smi**.
+
+Is it possible you have updated your NVIDIA GPU drivers after installing the CUDA toolkit? It looks like the toolkit expects drivers version 367.57, while you are running a more recent version, 375.26.
+
+For a quick check, try reverting to NVIDIA drivers version 367.57; you can do it from **System Settings > Software and Updates > Additional Drivers**.
+
+Once confirmed the mismatch in expected drivers version is the issue, you can either stay with drivers version 367.57, or un-install CUDA Toolkit and cuDNN, update the drivers to 375.26, and the re-install CUDA Toolkit and cuDNN.
+```
+*** 
+```
+ubuntu@ip-172-31-11-164:~/.keras$ nvidia-smi
+Failed to initialize NVML: Driver/library version mismatch
+```
+```
+ubuntu@ip-172-31-11-164:~/.keras$ cat /proc/driver/nvidia/version
+NVRM version: NVIDIA UNIX x86_64 Kernel Module  367.57  Mon Oct  3 20:37:01 PDT 2016
+GCC version:  gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.4)
+```
+*** 解决办法
+As @etal said, rebooting can solve this problem, but I think a procedure without rebooting will help.
+
+For Chinese, check my blog -> https://comzyh.com/blog/archives/967/[中文版]
+
+The error message
+
+> NVML: Driver/library version mismatch
+
+tell us the Nvidia driver kernel module (kmod) have a wrong version, so we should unload this driver, and then load the correct version of kmod
+
+== How to do that ?
+
+First, we should know which drivers are loaded.
+
+> lsmod | grep nvidia
+
+you may get
+
+[source,java]
+----
+nvidia_uvm            634880  8
+nvidia_drm             53248  0
+nvidia_modeset        790528  1 nvidia_drm
+nvidia              12312576  86 nvidia_modeset,nvidia_uvm
+----
+
+our final goal is to unload ``nvidia`` mod, so we should unload the module depend on ``nvidia``
+
+> sudo rmmod nvidia_drm  
+> sudo rmmod nvidia_modeset  
+> sudo rmmod nvidia_uvm
+
+then, unload ``nvidia``
+
+> sudo rmmod nvidia
+
+== Troubleshooting
+
+if you get an error like ``rmmod: ERROR: Module nvidia is in use``, which indicates that the kernel module is in use, you should kill the process that using the kmod:
+
+> sudo lsof /dev/nvidia*
+
+and then kill those process, then continue to unload the kmods
+
+== Test
+
+confirm you successfully unload those kmods
+
+> lsmod | grep nvidia
+
+you should get nothing, then confirm you can load the correct driver
+
+> nvidia-smi
+
+you should get the correct output
+
+
+
+
+
+
