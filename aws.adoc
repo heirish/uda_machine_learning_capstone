@@ -158,7 +158,8 @@ you should get nothing, then confirm you can load the correct driver
 
 you should get the correct output
 
-
+== 监控GPU
+watch -n 1 nvidia-smi
 
 
 
