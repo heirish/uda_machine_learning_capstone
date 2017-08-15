@@ -10,6 +10,7 @@ http://www.pyimagesearch.com/2017/03/20/imagenet-vggnet-resnet-inception-xceptio
 
 
 learning_rate and batch_size:http://cs231n.github.io/neural-networks-3/#loss
+batch-size:https://stats.stackexchange.com/questions/153531/what-is-batch-size-in-neural-network
 
 visualize image:
 https://blog.keras.io/how-convolutional-neural-networks-see-the-world.html
