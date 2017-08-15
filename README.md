@@ -7,6 +7,8 @@ https://adbrebs.wordpress.com/2015/03/16/97-64-accuracy/
 https://www.analyticsvidhya.com/blog/2016/04/deep-learning-computer-vision-introduction-convolution-neural-networks/
 https://arxiv.org/pdf/1409.1556.pdf
 http://www.pyimagesearch.com/2017/03/20/imagenet-vggnet-resnet-inception-xception-keras/
+
+
 learning_rate and batch_size:http://cs231n.github.io/neural-networks-3/#loss
 
 visualize image:
