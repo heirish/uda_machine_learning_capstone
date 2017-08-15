@@ -10,3 +10,4 @@ http://www.pyimagesearch.com/2017/03/20/imagenet-vggnet-resnet-inception-xceptio
 
 visualize image:
 https://blog.keras.io/how-convolutional-neural-networks-see-the-world.html
+https://github.com/fchollet/keras/blob/master/examples/conv_filter_visualization.py
