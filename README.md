@@ -16,3 +16,6 @@ batch-size:https://stats.stackexchange.com/questions/153531/what-is-batch-size-i
 visualize image:
 https://blog.keras.io/how-convolutional-neural-networks-see-the-world.html
 https://github.com/fchollet/keras/blob/master/examples/conv_filter_visualization.py
+
+Next Step:
+LSTM:http://www.cnblogs.com/arkenstone/p/5794063.html
