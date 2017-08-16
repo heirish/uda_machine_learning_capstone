@@ -32,7 +32,6 @@ def model_vgg16(image_width, image_height):
     model.add(Dense(4096, activation='relu', name='dense1'))
     model.add(Dense(4096, activation='relu', name='dense2'))
     model.add(Dense(1000, activation='relu', name='dense3'))
-    model.add(Dense(1, activation='sigmoid', name='dense4'))
     
     return model
 
@@ -68,7 +67,6 @@ def model_vgg19(image_width, image_height):
     model.add(Dense(4096, activation='relu', name='dense1'))
     model.add(Dense(4096, activation='relu', name='dense2'))
     model.add(Dense(1000, activation='relu', name='dense3'))
-    model.add(Dense(1, activation='sigmoid', name='dense4'))
     
     return model
 
@@ -78,28 +76,27 @@ def model_case1(image_width, image_height):
     model.add(Convolution2D(32, 3, 3, activation='relu', border_mode='same', name='block1_cov2'))
     model.add(MaxPooling2D((3,3), border_mode='same', name='block1_pool1'))
     
-    model.add(Convolution2D(64, 5, 5, activation='relu', border_mode='same', name='block2_cov1'))
-    model.add(Convolution2D(64, 5, 5, activation='relu', border_mode='same', name='block2_cov2'))
+    model.add(Convolution2D(64, 3, 3, activation='relu', border_mode='same', name='block2_cov1'))
+    model.add(Convolution2D(64, 3, 3, activation='relu', border_mode='same', name='block2_cov2'))
     model.add(MaxPooling2D((3,3), border_mode='same', name='block2_pool1'))
 
     model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same', name='block3_cov1'))
+    model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same', name='block3_cov2'))
     model.add(MaxPooling2D((3,3), border_mode='same', name='block3_pool'))
 
     model.add(Convolution2D(512, 3, 3, activation='relu', border_mode='same', name='block4_cov1'))
+    model.add(Convolution2D(512, 3, 3, activation='relu', border_mode='same', name='block4_cov2'))
     model.add(MaxPooling2D((3,3), border_mode='same', name='block4_pool'))
-    #model.add(Dropout(0.2, name="block3_dropout"))
-
-    model.add(Convolution2D(1024, 3, 3, activation='relu', border_mode='same', name='block5_cov1'))
-    model.add(MaxPooling2D((3,3), border_mode='same', name='block5_pool'))
     
-    model.add(Convolution2D(2048, 2, 2, activation='relu', border_mode='same', name='block6_cov1'))
-    model.add(MaxPooling2D((2,2), border_mode='same', name='block6_pool'))
-
+    model.add(Convolution2D(1024, 3, 3, activation='relu', border_mode='same', name='block5_cov1'))
+    
     model.add(Flatten(name='flat'))
-    model.add(Dense(64, activation='relu', name='dense1'))
-    model.add(Dense(64, activation='relu', name='dense2'))
-    #model.add(Dropout(0.4, name="dropout"))
-    model.add(Dense(1, activation='sigmoid', name='dense3'))
+    model.add(Dense(1024, activation='relu', name='dense2'))
+    #model.add(Dropout(0.5))
+    model.add(Dense(256, activation='relu', name='dense3'))
+    model.add(Dense(64, activation='relu', name='dense4'))
+    #model.add(Dropout(0.5))
+    model.add(Dense(1, activation='sigmoid', name='denseout'))
     
     return model
 
@@ -120,11 +117,32 @@ def model_mycase2(image_width, image_height):
     model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same', name='block5_cov1'))
     model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same', name='block5_cov2'))
     
-    model.add(Dropout(0.5))
+    model.add(Flatten(name='flat'))
+    model.add(Dense(256, activation='relu', name='dense1'))
+    model.add(Dense(128, activation='relu', name='dense2'))
+    model.add(Dense(1, activation='sigmoid', name='dense3'))
+    
+    return model
+
+def model_mycase2_tune(image_width, image_height):
+    model = Sequential()
+    model.add(Convolution2D(16, 3, 3, input_shape=(image_width, image_height,3), activation='relu', border_mode='same', name='block1_cov1'))
+    model.add(MaxPooling2D((2,2), border_mode='same', name='block1_pool1'))
+    
+    model.add(Convolution2D(32, 3, 3, activation='relu', border_mode='same', name='block2_cov1'))
+    model.add(MaxPooling2D((2,2), border_mode='same', name='block2_pool1'))
+    
+    model.add(Convolution2D(64, 3, 3, activation='relu', border_mode='same', name='block3_cov1'))
+    model.add(MaxPooling2D((2,2), border_mode='same', name='block3_pool1'))
+
+    model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same', name='block4_cov1'))
+    model.add(MaxPooling2D((2,2), border_mode='same', name='block4_pool'))
+    
+    model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same', name='block5_cov1'))
+    model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same', name='block5_cov2'))
     
     model.add(Flatten(name='flat'))
     model.add(Dense(256, activation='relu', name='dense1'))
-    model.add(Dropout(0.5))
     model.add(Dense(128, activation='relu', name='dense2'))
     model.add(Dropout(0.5))
     model.add(Dense(1, activation='sigmoid', name='dense3'))
