@@ -7,6 +7,13 @@
 * 登录使用ubuntu作为用户名
 
 image::images/Image-060817-124118.811.png[]
+
+* 升级keras, tensorflow
+```
+sudo /opt/anaconda3/bin/pip3.5 install tensorflow --upgrade
+sudo /opt/anaconda3/bin/pip3.5 install keras --upgrade
+```
+
 * 进去之后clone项目,然后在项目目录下启动jupyter notebook
 ```
 ubuntu@ip-172-31-11-164:~/udacity$ git clone https://github.com/heirish/uda_machine_learning_capstone.git
