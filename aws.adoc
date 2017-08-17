@@ -13,6 +13,15 @@ image::images/Image-060817-124118.811.png[]
 sudo /opt/anaconda3/bin/pip3.5 install tensorflow --upgrade
 sudo /opt/anaconda3/bin/pip3.5 install keras --upgrade
 ```
+[TIP]
+.Tips
+====
+:hardbreaks:
+报错:Found existing installation: setuptools 27.2.0
+Cannot remove entries from nonexistent file /opt/anaconda3/lib/python3.5/site-packages/easy-install.pth
+解决:加上 --ignore-installed
+sudo /opt/anaconda3/bin/pip3.5 install tensorflow --upgrade --ignore-installed
+====
 
 * 进去之后clone项目,然后在项目目录下启动jupyter notebook
 ```
