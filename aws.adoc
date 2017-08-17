@@ -10,8 +10,9 @@ image::images/Image-060817-124118.811.png[]
 
 * 升级keras, tensorflow, libcudnn
 ```
-sudo /opt/anaconda3/bin/pip3.5 install tensorflow --upgrade
 sudo /opt/anaconda3/bin/pip3.5 install keras --upgrade
+sudo /opt/anaconda3/bin/pip3.5 install tensorflow --upgrade
+sudo /opt/anaconda3/bin/pip3.5 install tensorflow-gpu --upgrade
 ```
 :hardbreaks:
 下载 cudnn https://developer.nvidia.com/rdp/cudnn-download
