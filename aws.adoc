@@ -8,10 +8,33 @@
 
 image::images/Image-060817-124118.811.png[]
 
-* 升级keras, tensorflow
+* 升级keras, tensorflow, libcudnn
 ```
 sudo /opt/anaconda3/bin/pip3.5 install tensorflow --upgrade
 sudo /opt/anaconda3/bin/pip3.5 install keras --upgrade
+```
+下载 cudnn https://developer.nvidia.com/rdp/cudnn-download
+上传至aws.
+解压tar -xzvf cudnn-8.0-linux-x64-v6.0.solitairetheme8
+设置环境变量vi .profile (生效 . .profile)
+新
+```
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64:/home/ubuntu/udacity/cuda/lib64"
+```
+原
+```
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64"
+```
+测试, 如果没报错就说明环境变量生效了，如果还是报错就把安装目录中的.so软链接到旧版的/usr/local/cuda/lib64目录下
+```
+ubuntu@ip-172-31-9-23:/usr/local/cuda/lib64$ python
+Python 3.5.2 |Anaconda custom (64-bit)| (default, Jul  2 2016, 17:53:06) 
+[GCC 4.4.7 20120313 (Red Hat 4.4.7-1)] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import tensorflow
+>>> import keras
+Using TensorFlow backend.
+>>> 
 ```
 [TIP]
 .Tips
@@ -21,6 +44,7 @@ sudo /opt/anaconda3/bin/pip3.5 install keras --upgrade
 Cannot remove entries from nonexistent file /opt/anaconda3/lib/python3.5/site-packages/easy-install.pth
 解决:加上 --ignore-installed
 sudo /opt/anaconda3/bin/pip3.5 install tensorflow --upgrade --ignore-installed
+如果不升级cudnn, 报错:ImportError: libcudnn.so.6: cannot open shared object file: No such file or directory
 ====
 
 * 进去之后clone项目,然后在项目目录下启动jupyter notebook
