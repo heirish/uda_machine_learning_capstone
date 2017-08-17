@@ -1,6 +1,7 @@
 #========================4.create model=========================
 from keras.models import Sequential
 from keras.layers import *
+from keras import regularizers
 
 # step_size and padding 会影响内存占用，step和padding调小以后perbatch就可以增大了 
 def model_vgg16(image_width, image_height):
@@ -129,7 +130,8 @@ def model_mycase2_tune(image_width, image_height):
     model.add(Convolution2D(16, 3, 3, input_shape=(image_width, image_height,3), activation='relu', border_mode='same', name='block1_cov1'))
     model.add(MaxPooling2D((2,2), border_mode='same', name='block1_pool1'))
     
-    model.add(Convolution2D(32, 3, 3, activation='relu', border_mode='same', name='block2_cov1'))
+    model.add(Convolution2D(32, 3, 3, activation='relu', border_mode='same', name='block2_cov1', kernel_regularizer=regularizers.l2(0.01)))
+    #model.add(Convolution2D(32, 3, 3, activation='relu', border_mode='same', name='block2_cov1'))
     model.add(MaxPooling2D((2,2), border_mode='same', name='block2_pool1'))
     
     model.add(Convolution2D(64, 3, 3, activation='relu', border_mode='same', name='block3_cov1'))
@@ -140,6 +142,7 @@ def model_mycase2_tune(image_width, image_height):
     
     model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same', name='block5_cov1'))
     model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same', name='block5_cov2'))
+    model.add(Dropout(0.5))
     
     model.add(Flatten(name='flat'))
     model.add(Dense(256, activation='relu', name='dense1'))
@@ -153,6 +156,7 @@ def model_mycase2_tune(image_width, image_height):
 #==========================5.train model==========================
 from keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import TensorBoard
+import math
 
 def train_data(model, model_name, epoch, image_size, num_perbatch, 
                train_dir, train_size, 
@@ -162,9 +166,11 @@ def train_data(model, model_name, epoch, image_size, num_perbatch,
         shear_range=0.2,
         zoom_range=0.2,
         horizontal_flip=True,
-        dim_ordering='tf')
-        #data_format='channels_last') #newer
-    valid_datagen = ImageDataGenerator(rescale=1./255,dim_ordering='tf')
+        #dim_ordering='tf')
+        data_format='channels_last') #newer
+    valid_datagen = ImageDataGenerator(rescale=1./255,
+                           #dim_ordering='tf')
+                           data_format='channels_last') #newer
 
     train_generator = train_datagen.flow_from_directory(
        train_dir,
@@ -180,11 +186,17 @@ def train_data(model, model_name, epoch, image_size, num_perbatch,
        class_mode='binary')
 
     log_location = "./" + model_name
+    '''
+    The semantics of the Keras 2 argument `steps_per_epoch` is not the same as the Keras 1 argument `samples_per_epoch`. `steps_per_epoch` is the number     of batches to draw from the generator at each epoch. Basically steps_per_epoch = samples_per_epoch/batch_size. 
+    Similarly `nb_val_samples`->`validation_steps` and `val_samples`->`steps` arguments have changed.
+    '''
     history = model.fit_generator(train_generator,
-                samples_per_epoch = train_size,
+                #samples_per_epoch = train_size,
+                steps_per_epoch = math.ceil(train_size / num_perbatch), #newer
                 nb_epoch=epoch,
                 validation_data=valid_generator,
-                nb_val_samples=valid_size,
+                #nb_val_samples=valid_size,
+                validation_steps = math.ceil(valid_size / num_perbatch), #newer
                 callbacks=[TensorBoard(log_dir=log_location)])
     
     return history
@@ -192,8 +204,8 @@ def train_data(model, model_name, epoch, image_size, num_perbatch,
 
 #================================5.visulize model training log data==========================
 import matplotlib.pyplot as plt
-#from keras.utils.vis_utils import plot_model, model_to_dot #newer
-from keras.utils.visualize_util import plot, model_to_dot
+from keras.utils.vis_utils import plot_model, model_to_dot #newer
+#from keras.utils.visualize_util import plot, model_to_dot
 from IPython.display import Image, SVG
 
 # visualize model
@@ -201,8 +213,8 @@ def visualize_model(model, model_name=None):
     if model == None or model_name == None:
         raise Exception("in save_model, invalid parameter")    
     image_name = model_name + ".png"
-    #plot_model(model, to_file=image_name, show_shapes=True) #newer
-    plot(model, to_file=image_name, show_shapes=True)
+    plot_model(model, to_file=image_name, show_shapes=True) #newer
+    #plot(model, to_file=image_name, show_shapes=True)
     SVG(model_to_dot(model).create(prog='dot', format='svg'))
     
 def visualize_history(history, model_name=None):
@@ -246,6 +258,7 @@ def predict_data(model, model_name, image_size, num_perbatch):
                                               batch_size=num_perbatch,
                                               class_mode=None)
     test = model.predict_generator(test_generator, test_generator.nb_sample)
+    test = test.clip(min=0.005, max=0.995) #https://www.kaggle.com/wiki/LogLoss
     df = pd.read_csv("./sample_submission.csv")
     for i, fname in enumerate(test_generator.filenames):
         print(i,fname)
