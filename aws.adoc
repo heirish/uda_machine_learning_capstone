@@ -13,6 +13,7 @@ image::images/Image-060817-124118.811.png[]
 sudo /opt/anaconda3/bin/pip3.5 install tensorflow --upgrade
 sudo /opt/anaconda3/bin/pip3.5 install keras --upgrade
 ```
+:hardbreaks:
 下载 cudnn https://developer.nvidia.com/rdp/cudnn-download
 上传至aws.
 解压tar -xzvf cudnn-8.0-linux-x64-v6.0.solitairetheme8
