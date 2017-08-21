@@ -6,33 +6,128 @@ from keras import regularizers
 # step_size and padding 会影响内存占用，step和padding调小以后perbatch就可以增大了 
 def model_vgg16(image_width, image_height):
     model = Sequential()
-    model.add(Convolution2D(64, 3, 3, input_shape=(image_width, image_height,3), activation='relu', border_mode='same', name='block1_conv1'))
-    model.add(Convolution2D(64, 3, 3, activation='relu', border_mode='same', name='block1_conv2'))
-    model.add(MaxPooling2D((2,2), border_mode='same', name='block1_pool'))
+    model.add(Conv2D(64, (3, 3), input_shape=(image_width, image_height,3), activation='relu', padding='same', name='block1_conv1'))
+    model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='block1_conv2'))
+    model.add(MaxPooling2D((2,2), padding='same', name='block1_pool'))
 
-    model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same', name='block2_conv1'))
-    model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same', name='block2_conv2'))
-    model.add(MaxPooling2D((2,2), border_mode='same', name='block2_pool'))
+    model.add(Conv2D(128, (3, 3), activation='relu', padding='same', name='block2_conv1'))
+    model.add(Conv2D(128, (3, 3), activation='relu', padding='same', name='block2_conv2'))
+    model.add(MaxPooling2D((2,2), padding='same', name='block2_pool'))
 
-    model.add(Convolution2D(256, 3, 3, activation='relu', border_mode='same', name='block3_conv1'))
-    model.add(Convolution2D(256, 3, 3, activation='relu', border_mode='same', name='block3_conv2'))
-    model.add(Convolution2D(256, 3, 3, activation='relu', border_mode='same', name='block3_conv3'))
-    model.add(MaxPooling2D((2,2), border_mode='same', name='block3_pool'))
+    model.add(Conv2D(256, (3, 3), activation='relu', padding='same', name='block3_conv1'))
+    model.add(Conv2D(256, (3, 3), activation='relu', padding='same', name='block3_conv2'))
+    model.add(Conv2D(256, (3, 3), activation='relu', padding='same', name='block3_conv3'))
+    model.add(MaxPooling2D((2,2), padding='same', name='block3_pool'))
 
-    model.add(Convolution2D(512, 3, 3, activation='relu', border_mode='same', name='block4_conv1'))
-    model.add(Convolution2D(512, 3, 3, activation='relu', border_mode='same', name='block4_conv2'))
-    model.add(Convolution2D(512, 3, 3, activation='relu', border_mode='same', name='block4_conv3'))
-    model.add(MaxPooling2D((2,2), border_mode='same', name='block4_pool'))
+    model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block4_conv1'))
+    model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block4_conv2'))
+    model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block4_conv3'))
+    model.add(MaxPooling2D((2,2), padding='same', name='block4_pool'))
 
-    model.add(Convolution2D(512, 3, 3, activation='relu', border_mode='same', name='block5_conv1'))
-    model.add(Convolution2D(512, 3, 3, activation='relu', border_mode='same', name='block5_conv2'))
-    model.add(Convolution2D(512, 3, 3, activation='relu', border_mode='same', name='block5_conv3'))
-    model.add(MaxPooling2D((2,2), border_mode='same', name='block5_pool'))
+    model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block5_conv1'))
+    model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block5_conv2'))
+    model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block5_conv3'))
+    model.add(MaxPooling2D((2,2), padding='same', name='block5_pool'))
 
     model.add(Flatten(name='flat'))
     model.add(Dense(4096, activation='relu', name='dense1'))
+    #model.add(Dense(4096, activation='relu', name='dense2'))
+    model.add(Dense(512, activation='relu', name='dense2'))
+    #model.add(Dense(1000, activation='relu', name='dense3'))
+    model.add(Dense(256, activation='relu', name='denseout1'))
+    model.add(Dense(64, activation='relu', name='denseout2'))
+    model.add(Dense(1, activation='sigmoid', name='denseout3'))
+    
+    return model
+
+def model_vgg161(image_width, image_height):
+    model = Sequential()
+    model.add(Conv2D(64, (3, 3), input_shape=(image_width, image_height,3), activation='relu', padding='same', name='block1_conv1'))
+    model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='block1_conv2'))
+    model.add(MaxPooling2D((2,2), padding='same', name='block1_pool'))
+
+    model.add(Conv2D(128, (3, 3), activation='relu', padding='same', name='block2_conv1'))
+    model.add(Conv2D(128, (3, 3), activation='relu', padding='same', name='block2_conv2'))
+    model.add(MaxPooling2D((2,2), padding='same', name='block2_pool'))
+
+    model.add(Conv2D(256, (3, 3), activation='relu', padding='same', name='block3_conv1'))
+    model.add(Conv2D(256, (3, 3), activation='relu', padding='same', name='block3_conv2'))
+    model.add(Conv2D(256, (3, 3), activation='relu', padding='same', name='block3_conv3'))
+    model.add(MaxPooling2D((2,2), padding='same', name='block3_pool'))
+
+    model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block4_conv1'))
+    model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block4_conv2'))
+    model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block4_conv3'))
+    model.add(MaxPooling2D((2,2), padding='same', name='block4_pool'))
+
+    model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block5_conv1'))
+    model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block5_conv2'))
+    model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block5_conv3'))
+    model.add(MaxPooling2D((2,2), padding='same', name='block5_pool'))
+
+    #model.add(Dropout(0.5))
+    model.add(Flatten(name='flat'))
+    model.add(Dense(4096, activation='relu', name='dense1'))
+    #model.add(Dense(4096, activation='relu', name='dense2'))
+    model.add(Dense(512, activation='relu', name='dense2'))
+    #model.add(Dense(1000, activation='relu', name='dense3'))
+    model.add(Dense(256, activation='relu', name='denseout1'))
+    model.add(Dense(64, activation='relu', name='denseout2'))
+    model.add(Dense(2, activation='softmax', name='denseout3'))
+    
+    return model
+
+def model_vgg162(image_width, image_height):
+    model = Sequential()
+    model.add(Conv2D(64, (3, 3), input_shape=(image_width, image_height,3), activation='relu', padding='same', name='block1_conv1'))
+    model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='block1_conv2'))
+    model.add(MaxPooling2D((2,2), padding='same', name='block1_pool'))
+
+    model.add(Conv2D(128, (3, 3), activation='relu', padding='same', name='block2_conv1'))
+    model.add(Conv2D(128, (3, 3), activation='relu', padding='same', name='block2_conv2'))
+    model.add(MaxPooling2D((2,2), padding='same', name='block2_pool'))
+
+    model.add(Conv2D(256, (3, 3), activation='relu', padding='same', name='block3_conv1'))
+    model.add(Conv2D(256, (3, 3), activation='relu', padding='same', name='block3_conv2'))
+    model.add(Conv2D(256, (3, 3), activation='relu', padding='same', name='block3_conv3'))
+    model.add(MaxPooling2D((2,2), padding='same', name='block3_pool'))
+
+    model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block4_conv1'))
+    model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block4_conv2'))
+    model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block4_conv3'))
+    model.add(MaxPooling2D((2,2), padding='same', name='block4_pool'))
+
+    model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block5_conv1'))
+    model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block5_conv2'))
+    model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block5_conv3'))
+    model.add(MaxPooling2D((2,2), padding='same', name='block5_pool'))
+
+    model.add(Dropout(0.5))
+    model.add(Flatten(name='flat'))
+    model.add(Dense(4096, activation='relu', name='dense1'))
     model.add(Dense(4096, activation='relu', name='dense2'))
-    model.add(Dense(1000, activation='relu', name='dense3'))
+    #model.add(Dense(512, activation='relu', name='dense2'))
+    #model.add(Dense(1000, activation='relu', name='dense3'))
+    #model.add(Dense(256, activation='relu', name='denseout1'))
+    #model.add(Dense(64, activation='relu', name='denseout2'))
+    model.add(Dense(2, activation='softmax', name='denseout3'))
+    
+    return model
+
+from keras import applications
+def model_vgg16_pre_tune(image_width, image_height):
+    initial_model = applications.VGG16(weights='imagenet', include_top=True, input_tensor=Input(shape=(image_width,image_height,3)))
+    
+    model = Sequential()
+    for layer in initial_model.layers:
+        layer.trainable = False
+        model.add(layer)
+
+    
+    #model.add(Flatten(input_shape=initial_model.output_shape[1:]))
+    model.add(Dense(256, activation='relu'))
+    model.add(Dropout(0.5))
+    model.add(Dense(2, activation='softmax'))
     
     return model
 
@@ -67,7 +162,7 @@ def model_vgg19(image_width, image_height):
     model.add(Flatten(name='flat'))
     model.add(Dense(4096, activation='relu', name='dense1'))
     model.add(Dense(4096, activation='relu', name='dense2'))
-    model.add(Dense(1000, activation='relu', name='dense3'))
+    #model.add(Dense(1000, activation='relu', name='dense3'))
     
     return model
 
@@ -127,31 +222,62 @@ def model_mycase2(image_width, image_height):
 
 def model_mycase2_tune(image_width, image_height):
     model = Sequential()
-    model.add(Convolution2D(16, 3, 3, input_shape=(image_width, image_height,3), activation='relu', border_mode='same', name='block1_cov1'))
-    model.add(MaxPooling2D((2,2), border_mode='same', name='block1_pool1'))
+    model.add(Conv2D(16, (3, 3), input_shape=(image_width, image_height,3), activation='relu', padding='same', name='block1_cov1'))
+    model.add(MaxPooling2D((2,2), padding='same', name='block1_pool1'))
     
-    model.add(Convolution2D(32, 3, 3, activation='relu', border_mode='same', name='block2_cov1', kernel_regularizer=regularizers.l2(0.01)))
-    #model.add(Convolution2D(32, 3, 3, activation='relu', border_mode='same', name='block2_cov1'))
-    model.add(MaxPooling2D((2,2), border_mode='same', name='block2_pool1'))
+    model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='block2_cov1'))
+    model.add(MaxPooling2D((2,2), padding='same', name='block2_pool1'))
     
-    model.add(Convolution2D(64, 3, 3, activation='relu', border_mode='same', name='block3_cov1'))
-    model.add(MaxPooling2D((2,2), border_mode='same', name='block3_pool1'))
-
-    model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same', name='block4_cov1'))
-    model.add(MaxPooling2D((2,2), border_mode='same', name='block4_pool'))
+    model.add(Conv2D(64,(3, 3), activation='relu', padding='same', name='block3_cov1'))
+    model.add(MaxPooling2D((2,2), padding='same', name='block3_pool1'))
+ 
+    model.add(Conv2D(128, (3, 3), activation='relu', padding='same', name='block4_cov1'))
+    model.add(Conv2D(128,(3, 3), activation='relu', padding='same', name='block4_cov2'))
+    model.add(MaxPooling2D((2,2), padding='same', name='block4_pool'))
     
-    model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same', name='block5_cov1'))
-    model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same', name='block5_cov2'))
+    model.add(Conv2D(256, (3, 3), activation='relu', padding='same', name='block5_cov1'))
+    model.add(Conv2D(256,(3, 3), activation='relu', padding='same', name='block5_cov2'))
     model.add(Dropout(0.5))
     
     model.add(Flatten(name='flat'))
     model.add(Dense(256, activation='relu', name='dense1'))
+    model.add(Dropout(0.5))
     model.add(Dense(128, activation='relu', name='dense2'))
     model.add(Dropout(0.5))
-    model.add(Dense(1, activation='sigmoid', name='dense3'))
+    model.add(Dense(2, activation='softmax', name='dense3'))
     
     return model
     
+def model_mycase2_tune1(image_width, image_height):
+    model = Sequential()
+    #model.add(Convolution2D(16, 3, 3, input_shape=(image_width, image_height,3), activation='relu', border_mode='same', name='block1_cov1'))
+    #model.add(MaxPooling2D((2,2), border_mode='same', name='block1_pool1'))
+    model.add(Conv2D(16, (3, 3), input_shape=(image_width, image_height,3), activation='relu', padding='same', name='block1_cov1'))
+    model.add(MaxPooling2D((2,2), padding='same', name='block1_pool1'))
+    
+    model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='block2_cov1'))
+    model.add(MaxPooling2D((2,2), padding='same', name='block2_pool1'))
+    
+    model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='block3_cov1', kernel_regularizer=regularizers.l2(0.01)))
+    model.add(MaxPooling2D((2,2), padding='same', name='block3_pool1'))
+ 
+    model.add(Conv2D(128, (3, 3), activation='relu', padding='same', name='block4_cov1'))
+    model.add(Conv2D(128, (3, 3), activation='relu', padding='same', name='block4_cov2'))
+    model.add(MaxPooling2D((2,2), padding='same', name='block4_pool'))
+    
+    model.add(Conv2D(256, (3, 3), activation='relu', padding='same', name='block5_cov1'))
+    model.add(Conv2D(256, (3, 3), activation='relu', padding='same', name='block5_cov2'))
+    model.add(Dropout(0.5))
+    
+    model.add(Flatten(name='flat'))
+    #model.add(Dense(512, activation='relu', name='dense1'))
+    model.add(Dense(256, activation='relu', name='dense2'))
+    model.add(Dropout(0.5))
+    model.add(Dense(128, activation='relu', name='dense3'))
+    model.add(Dropout(0.5))
+    model.add(Dense(2, activation='softmax', name='dense4'))
+        
+    return model
 
 #==========================5.train model==========================
 from keras.preprocessing.image import ImageDataGenerator
@@ -178,7 +304,7 @@ def train_data(model, model_name, epoch, image_size, num_perbatch,
        batch_size = num_perbatch,
        shuffle = True,
        class_mode='binary')
-    valid_generator = train_datagen.flow_from_directory(
+    valid_generator = valid_datagen.flow_from_directory( #最初因为此处的valid_datagen写成了train_datagen, 验证集的loss一直到0.24就死活下不去了
        valid_dir,
        target_size=image_size,
        batch_size = num_perbatch,
@@ -193,13 +319,62 @@ def train_data(model, model_name, epoch, image_size, num_perbatch,
     history = model.fit_generator(train_generator,
                 #samples_per_epoch = train_size,
                 steps_per_epoch = math.ceil(train_size / num_perbatch), #newer
-                nb_epoch=epoch,
+                #nb_epoch=epoch,
+                epochs = epoch, #newer
                 validation_data=valid_generator,
                 #nb_val_samples=valid_size,
                 validation_steps = math.ceil(valid_size / num_perbatch), #newer
                 callbacks=[TensorBoard(log_dir=log_location)])
     
     return history
+
+
+from keras import callbacks
+def train_data_earlystopping(model, model_name, epoch, image_size, num_perbatch, 
+               train_dir, train_size, 
+               valid_dir, valid_size):
+    train_datagen = ImageDataGenerator(
+        rescale=1./255,
+        shear_range=0.2,
+        zoom_range=0.2,
+        horizontal_flip=True,
+        #dim_ordering='tf')
+        data_format='channels_last') #newer
+    valid_datagen = ImageDataGenerator(rescale=1./255,
+                           #dim_ordering='tf')
+                           data_format='channels_last') #newer
+    
+    train_generator = train_datagen.flow_from_directory(
+       train_dir,
+       target_size=image_size,
+       batch_size = num_perbatch,
+       shuffle = True,
+       class_mode='categorical')
+    valid_generator = valid_datagen.flow_from_directory( #最初因为此处的valid_datagen写成了train_datagen, 验证集的loss一直到0.24就死活下不去了
+       valid_dir,
+       target_size=image_size,
+       batch_size = num_perbatch,
+       shuffle = True,
+       class_mode='categorical')
+
+    log_location = "./" + model_name
+    '''
+    The semantics of the Keras 2 argument `steps_per_epoch` is not the same as the Keras 1 argument `samples_per_epoch`. `steps_per_epoch` is the number     of batches to draw from the generator at each epoch. Basically steps_per_epoch = samples_per_epoch/batch_size. 
+    Similarly `nb_val_samples`->`validation_steps` and `val_samples`->`steps` arguments have changed.
+    '''
+    early_stopping = callbacks.EarlyStopping(monitor='val_loss', patience=5)   
+    history = model.fit_generator(train_generator,
+                #samples_per_epoch = train_size,
+                steps_per_epoch = math.ceil(train_size / num_perbatch), #newer
+                #nb_epoch=epoch,
+                epochs = epoch, #newer
+                validation_data=valid_generator,
+                #nb_val_samples=valid_size,
+                validation_steps = math.ceil(valid_size / num_perbatch), #newer
+                callbacks=[TensorBoard(log_dir=log_location), early_stopping])
+    
+    return history
+
 
 
 #================================5.visulize model training log data==========================
@@ -257,7 +432,9 @@ def predict_data(model, model_name, image_size, num_perbatch):
     test_generator = gen.flow_from_directory("./test", target_size=image_size, shuffle=False, 
                                               batch_size=num_perbatch,
                                               class_mode=None)
-    test = model.predict_generator(test_generator, test_generator.nb_sample)
+    test = model.predict_generator(test_generator,
+                        test_generator.samples) #newer
+                        #test_generator.nb_sample)
     test = test.clip(min=0.005, max=0.995) #https://www.kaggle.com/wiki/LogLoss
     df = pd.read_csv("./sample_submission.csv")
     for i, fname in enumerate(test_generator.filenames):
