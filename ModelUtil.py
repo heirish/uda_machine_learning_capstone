@@ -116,18 +116,20 @@ def model_vgg162(image_width, image_height):
 
 from keras import applications
 def model_vgg16_pre_tune(image_width, image_height):
-    initial_model = applications.VGG16(weights='imagenet', include_top=True, input_tensor=Input(shape=(image_width,image_height,3)))
+    #initial_model = applications.VGG16(weights='imagenet', include_top=True, input_tensor=Input(shape=(image_width,image_height,3)))
+    initial_model = applications.VGG16(weights='imagenet', include_top=False, input_tensor=Input(shape=(image_width,image_height,3)))
     
     model = Sequential()
     for layer in initial_model.layers:
         layer.trainable = False
         model.add(layer)
 
-    
-    #model.add(Flatten(input_shape=initial_model.output_shape[1:]))
+    model.add(Flatten(input_shape=initial_model.output_shape[1:]))
     model.add(Dense(256, activation='relu'))
     model.add(Dropout(0.5))
-    model.add(Dense(2, activation='softmax'))
+    model.add(Dense(128, activation='relu'))
+    model.add(Dense(64, activation='relu'))
+    model.add(Dense(1, activation='sigmoid'))
     
     return model
 
@@ -349,13 +351,13 @@ def train_data_earlystopping(model, model_name, epoch, image_size, num_perbatch,
        target_size=image_size,
        batch_size = num_perbatch,
        shuffle = True,
-       class_mode='categorical')
+       class_mode='binary')
     valid_generator = valid_datagen.flow_from_directory( #最初因为此处的valid_datagen写成了train_datagen, 验证集的loss一直到0.24就死活下不去了
        valid_dir,
        target_size=image_size,
        batch_size = num_perbatch,
        shuffle = True,
-       class_mode='categorical')
+       class_mode='binary')
 
     log_location = "./" + model_name
     '''
