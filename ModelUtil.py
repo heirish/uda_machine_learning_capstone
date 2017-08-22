@@ -133,6 +133,29 @@ def model_vgg16_pre_tune(image_width, image_height):
     
     return model
 
+def model_vgg16_pre_tune1(image_width, image_height):
+    #initial_model = applications.VGG16(weights='imagenet', include_top=True, input_tensor=Input(shape=(image_width,image_height,3)))
+    initial_model = applications.VGG16(weights='imagenet', include_top=False, input_tensor=Input(shape=(image_width,image_height,3)))
+    
+    model = Sequential()
+    for layer in initial_model.layers:
+        layer.trainable = False
+        model.add(layer)
+
+    model.add(Flatten(input_shape=initial_model.output_shape[1:]))
+    #model.add(Dense(4096, activation='relu'))  #tune2
+    model.add(Dense(1024, activation='relu'))
+    #model.add(Dropout(0.5)) #tune2
+    model.add(Dense(512, activation='relu'))
+    #model.add(Dropout(0.5)) #tune2
+    model.add(Dense(256, activation='relu'))
+    model.add(Dropout(0.5))
+    model.add(Dense(128, activation='relu'))
+    model.add(Dense(64, activation='relu'))
+    model.add(Dense(1, activation='sigmoid'))
+    
+    return model
+
 def model_vgg19(image_width, image_height):
     model = Sequential()
     model.add(Convolution2D(64, 3, 3, input_shape=(image_width, image_height,3), activation='relu', border_mode='same', name='block1_conv1'))
