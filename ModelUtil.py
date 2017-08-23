@@ -156,6 +156,29 @@ def model_vgg16_pre_tune1(image_width, image_height):
     
     return model
 
+def model_vgg16_pre_tune2(image_width, image_height):
+    #initial_model = applications.VGG16(weights='imagenet', include_top=True, input_tensor=Input(shape=(image_width,image_height,3)))
+    initial_model = applications.VGG16(weights='imagenet', include_top=False, input_tensor=Input(shape=(image_width,image_height,3)))
+    
+    model = Sequential()
+    for layer in initial_model.layers: #initial_model.layers[:-1] layer 1000 drop
+        layer.trainable = False
+        model.add(layer)
+
+    model.add(Flatten(input_shape=initial_model.output_shape[1:]))
+    #model.add(Dense(4096, activation='relu'))  #tune2
+    #model.add(Dense(1024, activation='relu'))
+    #model.add(Dropout(0.5)) #tune2
+    #model.add(Dense(512, activation='relu'))
+    #model.add(Dropout(0.5)) #tune2
+    #model.add(Dense(256, activation='relu'))
+    #model.add(Dropout(0.5))
+    #model.add(Dense(128, activation='relu'))
+    #model.add(Dense(64, activation='relu'))
+    model.add(Dense(2, activation='softmax'))
+    
+    return model
+
 def model_vgg19(image_width, image_height):
     model = Sequential()
     model.add(Convolution2D(64, 3, 3, input_shape=(image_width, image_height,3), activation='relu', border_mode='same', name='block1_conv1'))
@@ -374,20 +397,22 @@ def train_data_earlystopping(model, model_name, epoch, image_size, num_perbatch,
        target_size=image_size,
        batch_size = num_perbatch,
        shuffle = True,
-       class_mode='binary')
+       class_mode='categorical')
     valid_generator = valid_datagen.flow_from_directory( #最初因为此处的valid_datagen写成了train_datagen, 验证集的loss一直到0.24就死活下不去了
        valid_dir,
        target_size=image_size,
        batch_size = num_perbatch,
        shuffle = True,
-       class_mode='binary')
+       class_mode='categorical')
 
     log_location = "./" + model_name
     '''
     The semantics of the Keras 2 argument `steps_per_epoch` is not the same as the Keras 1 argument `samples_per_epoch`. `steps_per_epoch` is the number     of batches to draw from the generator at each epoch. Basically steps_per_epoch = samples_per_epoch/batch_size. 
     Similarly `nb_val_samples`->`validation_steps` and `val_samples`->`steps` arguments have changed.
     '''
-    early_stopping = callbacks.EarlyStopping(monitor='val_loss', patience=5)   
+    early_stopping = callbacks.EarlyStopping(monitor='val_loss', patience=5)  
+    file_bath = "./" + model_name + "_top.h5"
+    check_point = callbacks.ModelCheckpoint(file_bath, "val_loss", verbose=1, save_best_only=True)
     history = model.fit_generator(train_generator,
                 #samples_per_epoch = train_size,
                 steps_per_epoch = math.ceil(train_size / num_perbatch), #newer
@@ -396,7 +421,7 @@ def train_data_earlystopping(model, model_name, epoch, image_size, num_perbatch,
                 validation_data=valid_generator,
                 #nb_val_samples=valid_size,
                 validation_steps = math.ceil(valid_size / num_perbatch), #newer
-                callbacks=[TensorBoard(log_dir=log_location), early_stopping])
+                callbacks=[TensorBoard(log_dir=log_location), early_stopping, check_point])
     
     return history
 
