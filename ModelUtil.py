@@ -73,44 +73,7 @@ def model_vgg161(image_width, image_height):
     #model.add(Dense(1000, activation='relu', name='dense3'))
     model.add(Dense(256, activation='relu', name='denseout1'))
     model.add(Dense(64, activation='relu', name='denseout2'))
-    model.add(Dense(2, activation='softmax', name='denseout3'))
-    
-    return model
-
-def model_vgg162(image_width, image_height):
-    model = Sequential()
-    model.add(Conv2D(64, (3, 3), input_shape=(image_width, image_height,3), activation='relu', padding='same', name='block1_conv1'))
-    model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='block1_conv2'))
-    model.add(MaxPooling2D((2,2), padding='same', name='block1_pool'))
-
-    model.add(Conv2D(128, (3, 3), activation='relu', padding='same', name='block2_conv1'))
-    model.add(Conv2D(128, (3, 3), activation='relu', padding='same', name='block2_conv2'))
-    model.add(MaxPooling2D((2,2), padding='same', name='block2_pool'))
-
-    model.add(Conv2D(256, (3, 3), activation='relu', padding='same', name='block3_conv1'))
-    model.add(Conv2D(256, (3, 3), activation='relu', padding='same', name='block3_conv2'))
-    model.add(Conv2D(256, (3, 3), activation='relu', padding='same', name='block3_conv3'))
-    model.add(MaxPooling2D((2,2), padding='same', name='block3_pool'))
-
-    model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block4_conv1'))
-    model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block4_conv2'))
-    model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block4_conv3'))
-    model.add(MaxPooling2D((2,2), padding='same', name='block4_pool'))
-
-    model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block5_conv1'))
-    model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block5_conv2'))
-    model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block5_conv3'))
-    model.add(MaxPooling2D((2,2), padding='same', name='block5_pool'))
-
-    model.add(Dropout(0.5))
-    model.add(Flatten(name='flat'))
-    model.add(Dense(4096, activation='relu', name='dense1'))
-    model.add(Dense(4096, activation='relu', name='dense2'))
-    #model.add(Dense(512, activation='relu', name='dense2'))
-    #model.add(Dense(1000, activation='relu', name='dense3'))
-    #model.add(Dense(256, activation='relu', name='denseout1'))
-    #model.add(Dense(64, activation='relu', name='denseout2'))
-    model.add(Dense(2, activation='softmax', name='denseout3'))
+    model.add(Dense(1, activation='sigmoid', name='denseout3'))
     
     return model
 
@@ -176,29 +139,19 @@ def model_vgg16_pre_tune2(image_width, image_height):
     
     return model
 
-def model_vgg16_pre_tune3(image_width, image_height):
-    #initial_model = applications.VGG16(weights='imagenet', include_top=True, input_tensor=Input(shape=(image_width,image_height,3)))
-    initial_model = applications.VGG16(weights='imagenet', include_top=False, input_tensor=Input(shape=(image_width,image_height,3)))
+from keras.applications.resnet50 import ResNet50
+def model_pre_tune3(image_width, image_height):
+    initial_model = applications.ResNet50(weights='imagenet', include_top=False, input_tensor=Input(shape=(image_width,image_height,3)))
     
-    model = Sequential()
-    for layer in initial_model.layers[:-3]: #initial_model.layers[:-1] layer 1000 drop
-        layer.trainable=False
-        model.add(layer)
-
+    x = initial_model.output
+    x = GlobalAveragePooling2D()(x)
+    #x = Dense(64, activation='relu')(x)
+    predictions = Dense(2, activation='softmax')(x) 
+    model = Model(inputs=initial_model.input, outputs=predictions)
+    for layer in initial_model.layers:
+        layer.trainable = False
+  
     model.summary()
-    model.add(MaxPooling2D((2,2), padding='same'))
-    model.add(GlobalAveragePooling2D())
-    #model.add(Dense(64))
-    #model.add(BatchNormalization())
-    #model.add(Activation('relu'))
-    #model.add(Dropout(0.5))
-    #model.add(Dense(1, activation='sigmoid'))
-    model.add(Dense(1))
-    model.add(BatchNormalization())
-    model.add(Activation('sigmoid'))
-    model.summary()
-    #for layer in model.layers[:-3]: #initial_model.layers[:-1] layer 1000 drop
-    #    layer.trainable=False
     
     return model
 
@@ -455,13 +408,13 @@ def train_data_earlystopping(model, model_name, epoch, image_size, num_perbatch,
        target_size=image_size,
        batch_size = num_perbatch,
        shuffle = True,
-       class_mode='binary')
-    valid_generator = valid_datagen.flow_from_directory( #最初因为此处的valid_datagen写成了train_datagen, 验证集的loss一直到0.24就死活下不去了
+       class_mode='categorical')
+    valid_generator = valid_datagen.flow_from_directory( 
        valid_dir,
        target_size=image_size,
        batch_size = num_perbatch,
        shuffle = True,
-       class_mode='binary')
+       class_mode='categorical')
 
     log_location = "./" + model_name
     '''
@@ -551,7 +504,6 @@ def predict_data(model, model_name, image_size, num_perbatch):
         df.set_value(index-1, 'label', test[i])
 
     df.to_csv(model_name + '.csv', index=None)
-    df.head(10)
     
 #==============================7.save model=================
 #import h5py as h5py
@@ -562,6 +514,6 @@ except ImportError:
 def save_model(model, model_name):
     if model == None or model_name == None:
         raise Exception("in save_model, invalid parameter")
-    model.save_weights(model_name + '.h5')
+    #model.save_weights(model_name + '.h5')
     with open(model_name + '.json', 'w') as f:
         f.write(model.to_json())
