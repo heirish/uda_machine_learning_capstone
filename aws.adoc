@@ -206,3 +206,48 @@ watch -n 1 nvidia-smi
 
 Note 在分割数据集时，如果确定训练集和测试集的大小没有通用的做法，一般我们选择60:40, 70:30或者80:20。对于大数据集，90:10甚至 99:1也是比较常见的。还要注意的是，通过本地验证得到最优模型和参数时，还要在整个数据集(训练集+验证集+测试集)上训练一次，得到最终的模型。
 
+== 查看某层layer的w, x
+要注意的是此处输入的预处理，如果训练时进行了其它处理如rescale,这里一样也要处理。
+```
+from keras.models import model_from_json
+from keras.preprocessing.image import ImageDataGenerator
+import ModelUtil
+import importlib
+importlib.reload(ModelUtil)
+from quiver_engine import server
+from keras import applications
+
+image_width = 224
+image_height = 224
+perbatch = 64
+
+
+model_name="model_pre_tune3"
+model = model_from_json(open(model_name + '.json').read())
+model.load_weights(model_name + '_top.h5')
+for layer in model.layers:
+    layer.trainable = False
+#model.summary()
+
+from keras import backend as K
+
+inp = model.input  
+outputs = [layer.output for layer in model.layers[-3:]]          # all layer outputs
+functor = K.function([inp]+ [K.learning_phase()], outputs ) # evaluation function
+
+# Testing
+from keras.applications.resnet50 import ResNet50
+from keras.preprocessing import image
+from keras.applications.resnet50 import preprocess_input, decode_predictions
+import numpy as np
+img_path = './visual_images/test/cat.51.jpg'
+img = image.load_img(img_path, target_size=(224, 224))
+x = image.img_to_array(img)
+x = np.expand_dims(x, axis=0)
+x = preprocess_input(x)
+
+layer_outs = functor([x, 0.])
+print(layer_outs)
+print(y_classes)
+```
+

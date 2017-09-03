@@ -75,16 +75,31 @@ def model_vgg16_pre_tune2(image_width, image_height):
 
 from keras import applications
 import numpy as np
+from keras.models import Model
 def model_pre_tune3(image_width, image_height):
     initial_model = applications.ResNet50(weights='imagenet', include_top=False, 
                              input_tensor=Input(shape=(image_width,image_height,3)),
                              pooling = 'avg' )  
 
     x = initial_model.output
-    #x = Flatten()(x)
-    #x = GlobalAveragePooling2D()(x)
-    x = Dense(64, activation='relu')(x)
     predictions = Dense(1, activation='sigmoid')(x) 
+    model = Model(inputs=initial_model.input, outputs=predictions)
+    for layer in initial_model.layers:
+        layer.trainable = False
+
+    model.summary()
+    
+    return model
+
+def model_pre_tune4(image_width, image_height):
+    initial_model = applications.ResNet50(weights='imagenet', include_top=False, 
+                             input_tensor=Input(shape=(image_width,image_height,3)),
+                             pooling = 'avg' )  
+
+    x = initial_model.output
+    x = Dense(256, activation='relu')(x)
+    x = BatchNormalization()(x)
+    predictions = Dense(1, activation='sigmoid')(x)
     model = Model(inputs=initial_model.input, outputs=predictions)
     for layer in initial_model.layers:
         layer.trainable = False
@@ -137,11 +152,9 @@ def train_data(model, model_name, epoch, image_size, num_perbatch,
         shear_range=0.2,
         zoom_range=0.2,
         horizontal_flip=True,
-        #dim_ordering='tf')
-        data_format='channels_last') #newer
+        data_format='channels_last') 
     valid_datagen = ImageDataGenerator(rescale=1./255,
-                           #dim_ordering='tf')
-                           data_format='channels_last') #newer
+                           data_format='channels_last') 
 
     train_generator = train_datagen.flow_from_directory(
        train_dir,
@@ -162,13 +175,10 @@ def train_data(model, model_name, epoch, image_size, num_perbatch,
     Similarly `nb_val_samples`->`validation_steps` and `val_samples`->`steps` arguments have changed.
     '''
     history = model.fit_generator(train_generator,
-                #samples_per_epoch = train_size,
-                steps_per_epoch = math.ceil(train_size / num_perbatch), #newer
-                #nb_epoch=epoch,
-                epochs = epoch, #newer
+                steps_per_epoch = math.ceil(train_size / num_perbatch), 
+                epochs = epoch,
                 validation_data=valid_generator,
-                #nb_val_samples=valid_size,
-                validation_steps = math.ceil(valid_size / num_perbatch), #newer
+                validation_steps = math.ceil(valid_size / num_perbatch), 
                 callbacks=[TensorBoard(log_dir=log_location)])
     
     return history
@@ -183,11 +193,9 @@ def train_data_earlystopping(model, model_name, epoch, image_size, num_perbatch,
         shear_range=0.2,
         zoom_range=0.2,
         horizontal_flip=True,
-        #dim_ordering='tf')
-        data_format='channels_last') #newer
+        data_format='channels_last') 
     valid_datagen = ImageDataGenerator(rescale=1./255,
-                           #dim_ordering='tf')
-                           data_format='channels_last') #newer
+                           data_format='channels_last')
    
     train_generator = train_datagen.flow_from_directory(
        train_dir,
@@ -201,7 +209,6 @@ def train_data_earlystopping(model, model_name, epoch, image_size, num_perbatch,
        batch_size = num_perbatch,
        shuffle = True,
        class_mode='binary')
-    #print(train_generator.classes, valid_generator.classes)
 
     log_location = "./" + model_name
     '''
@@ -212,13 +219,10 @@ def train_data_earlystopping(model, model_name, epoch, image_size, num_perbatch,
     file_bath = "./" + model_name + "_top.h5"
     check_point = callbacks.ModelCheckpoint(file_bath, "val_loss", verbose=1, save_best_only=True)
     history = model.fit_generator(train_generator,
-                #samples_per_epoch = train_size,
-                steps_per_epoch = math.ceil(train_size / num_perbatch), #newer
-                #nb_epoch=epoch,
-                epochs = epoch, #newer
+                steps_per_epoch = math.ceil(train_size / num_perbatch), 
+                epochs = epoch,
                 validation_data=valid_generator,
-                #nb_val_samples=valid_size,
-                validation_steps = math.ceil(valid_size / num_perbatch), #newer
+                validation_steps = math.ceil(valid_size / num_perbatch),
                 callbacks=[TensorBoard(log_dir=log_location), early_stopping, check_point])
     
     return history
@@ -294,7 +298,8 @@ def predict_data(model, model_name, image_size, num_perbatch):
         raise Exception("in predict_data, invalid parameter")
         
     #test下面还要有一层test目录,./test/test/*.jpg
-    gen = ImageDataGenerator()
+    gen = ImageDataGenerator(rescale=1./255,
+        data_format='channels_last')
     test_generator = gen.flow_from_directory("./test", target_size=image_size, shuffle=False, 
                                               batch_size=num_perbatch,
                                               class_mode=None)
@@ -324,7 +329,8 @@ def save_model(model, model_name):
         f.write(model.to_json())
               
 def predict_small_data(model, data_dir, image_width, image_height, perbatch):
-    gen = ImageDataGenerator()
+    gen = ImageDataGenerator(rescale=1./255,
+        data_format='channels_last')
     test_generator = gen.flow_from_directory(data_dir, 
                                 target_size=(image_width, image_height), 
                                 shuffle=False, 
