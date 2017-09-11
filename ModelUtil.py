@@ -13,7 +13,7 @@ def model_mycase2_tune1(image_width, image_height):
     model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='block2_cov1'))
     model.add(MaxPooling2D((2,2), padding='same', name='block2_pool1'))
     
-    model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='block3_cov1', kernel_regularizer=regularizers.l2(0.01)))
+    model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='block3_cov1'))
     model.add(MaxPooling2D((2,2), padding='same', name='block3_pool1'))
  
     model.add(Conv2D(128, (3, 3), activation='relu', padding='same', name='block4_cov1'))
@@ -25,12 +25,10 @@ def model_mycase2_tune1(image_width, image_height):
     model.add(Dropout(0.5))
     
     model.add(Flatten(name='flat'))
-    #model.add(Dense(512, activation='relu', name='dense1'))
     model.add(Dense(256, activation='relu', name='dense2'))
     model.add(Dropout(0.5))
     model.add(Dense(128, activation='relu', name='dense3'))
-    model.add(Dropout(0.5))
-    model.add(Dense(1, activation='softmax', name='dense4'))
+    model.add(Dense(1, activation='sigmoid', name='dense4'))
         
     return model
 
