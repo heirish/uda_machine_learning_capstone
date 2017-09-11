@@ -30,7 +30,7 @@ def model_mycase2_tune1(image_width, image_height):
     model.add(Dropout(0.5))
     model.add(Dense(128, activation='relu', name='dense3'))
     model.add(Dropout(0.5))
-    model.add(Dense(2, activation='softmax', name='dense4'))
+    model.add(Dense(1, activation='softmax', name='dense4'))
         
     return model
 
