@@ -19,6 +19,7 @@ https://github.com/fchollet/keras/blob/master/examples/conv_filter_visualization
 
 Next Step:
 LSTM:http://www.cnblogs.com/arkenstone/p/5794063.html
+GAN:https://zhuanlan.zhihu.com/p/25471901
 
 层加深后引起的网络退化问题:在训练集上的准确率饱和或下降。
 http://www.jianshu.com/p/e58437f39f65
