@@ -96,6 +96,7 @@ def model_vgg16_pre_tune2(image_width, image_height):
     model.add(Activation('relu'))
     model.add(Dropout(0.5))
     '''
+    model.add(Dense(64, activation='relu'))
     model.add(Dense(1, activation='sigmoid'))
     
     return model
@@ -294,7 +295,7 @@ def predict_data(model, model_name, image_size, num_perbatch):
     test = model.predict_generator(test_generator,
                         test_generator.samples) #newer
                         #test_generator.nb_sample)
-    test = test.clip(min=0.005, max=0.995) #https://www.kaggle.com/wiki/LogLoss
+    #test = test.clip(min=0.005, max=0.995) #https://www.kaggle.com/wiki/LogLoss
     df = pd.read_csv("./sample_submission.csv")
     for i, fname in enumerate(test_generator.filenames):
         print(i,fname)
