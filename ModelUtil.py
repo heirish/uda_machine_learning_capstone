@@ -58,10 +58,9 @@ def model_vgg161(image_width, image_height):
     model.add(MaxPooling2D((2,2), padding='same', name='block5_pool'))
 
     model.add(Flatten(name='flat'))
-    model.add(Dense(4096, activation='relu', name='dense1'))
-    model.add(Dense(512, activation='relu', name='dense2'))
-    model.add(Dense(256, activation='relu', name='denseout1'))
-    model.add(Dense(64, activation='relu', name='denseout2'))
+    model.add(Dense(512, activation='relu', name='denseout1'))
+    model.add(Dense(128, activation='relu', name='denseout2'))
+    model.add(Dropout(0.5))
     model.add(Dense(1, activation='sigmoid', name='denseout3'))
     
     return model
@@ -75,12 +74,9 @@ def model_vgg16_pre_tune1(image_width, image_height):
         model.add(layer)
 
     model.add(Flatten(input_shape=initial_model.output_shape[1:]))
-    model.add(Dense(1024, activation='relu'))
     model.add(Dense(512, activation='relu'))
-    model.add(Dense(256, activation='relu'))
     model.add(Dropout(0.5))
     model.add(Dense(128, activation='relu'))
-    model.add(Dense(64, activation='relu'))
     model.add(Dense(1, activation='sigmoid'))
     
     return model
@@ -94,10 +90,12 @@ def model_vgg16_pre_tune2(image_width, image_height):
         model.add(layer)
 
     model.add(GlobalAveragePooling2D())
+    '''
     model.add(Dense(64))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
     model.add(Dropout(0.5))
+    '''
     model.add(Dense(1, activation='sigmoid'))
     
     return model
@@ -115,9 +113,7 @@ def model_pre_tune3(image_width, image_height):
     model = Model(inputs=initial_model.input, outputs=predictions)
     for layer in initial_model.layers:
         layer.trainable = False
-
-    model.summary()
-    
+        
     return model
 
 #==========================5.train model==========================
@@ -271,7 +267,20 @@ def visualize_history(history, model_name=None):
 
 #==============================6.predict test data============================
 import pandas as pd
-
+def predict_small_data(model, data_dir, image_width, image_height, perbatch):
+    gen = ImageDataGenerator(rescale=1./255,
+        data_format='channels_last')
+    test_generator = gen.flow_from_directory(data_dir, 
+                                target_size=(image_width, image_height), 
+                                shuffle=False, 
+                                batch_size=perbatch,
+                                class_mode=None)
+    test = model.predict_generator(test_generator,
+                        test_generator.samples) #newer
+                        #test_generator.nb_sample)
+    for i, fname in enumerate(test_generator.filenames):
+        print(i,fname, test[i])
+        
 def predict_data(model, model_name, image_size, num_perbatch):
     if model == None or model_name == None:
         raise Exception("in predict_data, invalid parameter")
@@ -307,18 +316,3 @@ def save_model(model, model_name):
     #model.save_weights(model_name + '.h5')
     with open(model_name + '.json', 'w') as f:
         f.write(model.to_json())
-              
-def predict_small_data(model, data_dir, image_width, image_height, perbatch):
-    gen = ImageDataGenerator(rescale=1./255,
-        data_format='channels_last')
-    test_generator = gen.flow_from_directory(data_dir, 
-                                target_size=(image_width, image_height), 
-                                shuffle=False, 
-                                batch_size=perbatch,
-                                class_mode=None)
-    test = model.predict_generator(test_generator,
-                        test_generator.samples) #newer
-                        #test_generator.nb_sample)
-    for i, fname in enumerate(test_generator.filenames):
-        print(i,fname, test[i])
-              
