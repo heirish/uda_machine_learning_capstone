@@ -90,13 +90,9 @@ def model_vgg16_pre_tune2(image_width, image_height):
         model.add(layer)
 
     model.add(GlobalAveragePooling2D())
-    '''
-    model.add(Dense(64))
-    model.add(BatchNormalization())
-    model.add(Activation('relu'))
-    model.add(Dropout(0.5))
-    '''
-    model.add(Dense(64, activation='relu'))
+    model.add(Dense(1024, activation='relu'))
+    model.add(Dense(512, activation='relu'))
+    model.add(Dense(128, activation='relu'))
     model.add(Dense(1, activation='sigmoid'))
     
     return model
@@ -110,10 +106,10 @@ def model_pre_tune3(image_width, image_height):
                              pooling = 'avg' )  
 
     x = initial_model.output
-    predictions = Dense(1, activation='sigmoid')(x) 
-    model = Model(inputs=initial_model.input, outputs=predictions)
     for layer in initial_model.layers:
         layer.trainable = False
+    predictions = Dense(1, activation='sigmoid')(x) 
+    model = Model(inputs=initial_model.input, outputs=predictions)
         
     return model
 
@@ -298,7 +294,7 @@ def predict_data(model, model_name, image_size, num_perbatch):
     #test = test.clip(min=0.005, max=0.995) #https://www.kaggle.com/wiki/LogLoss
     df = pd.read_csv("./sample_submission.csv")
     for i, fname in enumerate(test_generator.filenames):
-        print(i,fname)
+        #print(i,fname,test[i])
         index = int(fname[fname.rfind('/')+1:fname.rfind('.')])
         df.set_value(index-1, 'label', test[i])
 
