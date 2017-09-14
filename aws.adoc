@@ -251,3 +251,13 @@ print(layer_outs)
 print(y_classes)
 ```
 
+== 因为保存了带gpu的ami, 在aws t2上运行时，会自动去找GPU
+由于predict花费的时间比较长,正常否?
+改为在不带GPU的普通机器上运行，aws t2
+结果运行时jupyter就会报错，先是去找GPU，找不到之后就报错，然后重启kernel.然后就死掉了
+因此，要先将t2上所有的tensorflow卸载干净,pip uninstall
+包括tensorflow(GPU机器上不需要这个), tensroflow-gpu(普通机器上不需要这个), tensorflow-tensorboard
+然后重新安装tensorflow.
+并且要注意的是，由于t2的硬件资源比较差，要将perbatch设置为1，64的话会将kernel搞死，然后又重启，然后就又没反应了。
+一切正常后，等预测结果。
+

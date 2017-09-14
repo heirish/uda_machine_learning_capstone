@@ -113,6 +113,22 @@ def model_pre_tune3(image_width, image_height):
         
     return model
 
+def model_pre_tune4(image_width, image_height):
+    initial_model = applications.ResNet50(weights='imagenet', include_top=False, 
+                             input_tensor=Input(shape=(image_width,image_height,3)) )  
+
+    for layer in initial_model.layers:
+        layer.trainable = False
+    x = initial_model.output
+    x = Flatten()(x)
+    x = Dense(512, activation='relu')(x)
+    x = Dropout(0.5)(x)
+    x= Dense(128, activation='relu')(x)
+    predictions = Dense(1, activation='sigmoid')(x) 
+    model = Model(inputs=initial_model.input, outputs=predictions)
+        
+    return model
+
 #==========================5.train model==========================
 from keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import TensorBoard
